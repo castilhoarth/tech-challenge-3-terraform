@@ -6,7 +6,7 @@ module "vpc" {
   public_subnets_cidr  = ["10.0.1.0/24", "10.0.2.0/24"]
   private_subnets_cidr = ["10.0.10.0/24", "10.0.11.0/24"]
   availability_zones   = ["us-east-1a", "us-east-1b"]
-  cluster_name         = "var.cluster_name"
+  cluster_name         = var.cluster_name
 }
 
 # 2. IAM (Roles do EKS e Permissões de Pods / IRSA)
@@ -30,9 +30,18 @@ module "eks" {
   node_role_arn    = module.iam.eks_node_role_arn
 
   instance_types = ["t3.micro"]
-  desired_size   = 3
-  min_size       = 2
-  max_size       = 5
+  desired_size   = 8
+  min_size       = 6
+  max_size       = 12
+}
+
+#instalação do nginx e argoCD
+module "helm" {
+  source = "./modules/helm"
+
+  depends_on = [
+    module.eks
+  ]
 }
 
 # 3. Banco de Dados (3 RDS PostgreSQL Isolados)

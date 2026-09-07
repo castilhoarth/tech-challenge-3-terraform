@@ -6,7 +6,7 @@ resource "aws_eks_cluster" "main" {
   name     = var.cluster_name
   role_arn = var.cluster_role_arn  # Usa a Role vinda do módulo IAM
 
-  vpc_config {
+   vpc_config {
     subnet_ids              = var.subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
@@ -23,9 +23,9 @@ resource "aws_eks_node_group" "main" {
   instance_types = ["t3.micro"]
 
   scaling_config {
-    desired_size = 2
-    max_size     = 3
-    min_size     = 1
+    desired_size = var.desired_size
+    max_size     = var.max_size
+    min_size     = var.min_size
   }
 }
 

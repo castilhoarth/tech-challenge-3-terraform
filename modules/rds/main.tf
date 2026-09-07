@@ -4,7 +4,7 @@ resource "random_password" "master_password" {
 
     length           = 16
     special          = true
-    override_special = "!#$%&*()-_=+[]{}<>:?" # Sem @, /, " ou espaço
+    override_special = "-_" # Sem @, /, " ou espaço
 }
 
 # 2. Cria a Secret no Secrest Manager

@@ -11,6 +11,12 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.0"
     }
+
+
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.17"
+    }
   }
 
   # Configuração do Remote State no S3 Backend
