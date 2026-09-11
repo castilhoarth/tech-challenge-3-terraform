@@ -13,8 +13,8 @@ RDS_AUTH_HOST=$(aws rds describe-db-instances --query "DBInstances[?contains(DBI
 RDS_FLAG_HOST=$(aws rds describe-db-instances --query "DBInstances[?contains(DBInstanceIdentifier, 'flag')].Endpoint.Address" --output text)
 
 # Busca os nomes dos Secrets no AWS Secrets Manager
-SECRET_AUTH_NAME=$(aws secretsmanager list-secrets --query "SecretList[?contains(Name, 'rds-auth')].Name" --output text | head -n 1)
-SECRET_FLAG_NAME=$(aws secretsmanager list-secrets --query "SecretList[?contains(Name, 'rds-flag')].Name" --output text | head -n 1)
+SECRET_AUTH_NAME="tech-challenge/rds-auth"
+SECRET_FLAG_NAME="tech-challenge/rds-flag"
 
 # Extrai as senhas do Secrets Manager
 RDS_AUTH_PWD=$(aws secretsmanager get-secret-value --secret-id "$SECRET_AUTH_NAME" --query SecretString --output text | jq -r '.password // .')

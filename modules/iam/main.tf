@@ -19,6 +19,43 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_Policy" {
     role       = aws_iam_role.eks_cluster.name
 }
 
+# Permissões para o EKS gerenciar Load Balancers dos Services
+resource "aws_iam_policy" "eks_load_balancer" {
+    name = "${var.cluster_name}-load-balancer"
+
+    policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [{
+            Effect = "Allow"
+            Action = [
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeLoadBalancerAttributes",
+                "elasticloadbalancing:DescribeListeners",
+                "elasticloadbalancing:DescribeListenerAttributes",
+                "elasticloadbalancing:DescribeTargetGroups",
+                "elasticloadbalancing:DescribeTargetHealth",
+                "elasticloadbalancing:CreateLoadBalancer",
+                "elasticloadbalancing:DeleteLoadBalancer",
+                "elasticloadbalancing:CreateTargetGroup",
+                "elasticloadbalancing:DeleteTargetGroup",
+                "elasticloadbalancing:RegisterTargets",
+                "elasticloadbalancing:DeregisterTargets",
+                "elasticloadbalancing:CreateListener",
+                "elasticloadbalancing:DeleteListener",
+                "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                "elasticloadbalancing:ModifyTargetGroup",
+                "elasticloadbalancing:ModifyTargetGroupAttributes"
+            ]
+            Resource = "*"
+        }]
+    })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_load_balancer" {
+    role       = aws_iam_role.eks_cluster.name
+    policy_arn = aws_iam_policy.eks_load_balancer.arn
+}
+
 # Role dos Node Groups (Workers)
 resource "aws_iam_role" "eks_nodes" {
     name = "${var.cluster_name}-node-role"
