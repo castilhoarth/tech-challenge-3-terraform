@@ -30,17 +30,20 @@ module "eks" {
   node_role_arn    = module.iam.eks_node_role_arn
 
   instance_types = ["t3.micro"]
-  desired_size   = 8
-  min_size       = 6
+  desired_size   = 10
+  min_size       = 8
   max_size       = 12
 }
 
-#instalação do nginx e argoCD
+#instalação do nginx e argoCD e external accounts
 module "helm" {
   source = "./modules/helm"
 
+  external_secrets_role_arn = module.external_secrets.role_arn
+
   depends_on = [
-    module.eks
+    module.eks,
+    module.external_secrets
   ]
 }
 
@@ -68,6 +71,10 @@ module "rds" {
       ]
     }
   }
+}
+
+module "secrets" {
+  source = "./modules/secrets"
 }
 
 # 5 . Cache (Elasticache Redis - Evaluation Service) 
@@ -108,4 +115,14 @@ module "ecr" {
     "evaluation-service",
     "analytics-service",
   ]
+}
+
+module "external_secrets" {
+  source = "./modules/external-secrets"
+
+  cluster_name      = var.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_issuer_url   = module.eks.oidc_issuer_url
+
+  depends_on = [module.eks]
 }
