@@ -19,9 +19,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/gerusalobo/toggle-master-devops.git
+    repoURL: https://github.com/castilhoarth/tech-challenge-3-k8s.git
     targetRevision: main
-    path: k8s/apps/toggle-prod
+    path: k8s/
     directory:
       recurse: true
   destination:
