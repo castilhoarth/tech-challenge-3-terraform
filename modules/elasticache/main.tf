@@ -6,7 +6,7 @@ resource "aws_elasticache_subnet_group" "main" {
 resource "aws_security_group" "toggle-master-redis_sg" {
   name   = "toggle-master-redis-sg"
   vpc_id = var.vpc_id
-  
+
   ingress {
     from_port       = 6379
     to_port         = 6379

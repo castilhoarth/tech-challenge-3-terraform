@@ -30,20 +30,21 @@ module "eks" {
   node_role_arn    = module.iam.eks_node_role_arn
 
   instance_types = ["t3.micro"]
-  desired_size   = 10
-  min_size       = 8
-  max_size       = 12
+  desired_size   = 11
+  min_size       = 9
+  max_size       = 15
 }
 
-#instalação do nginx e argoCD e external accounts
+#instalação do nginx, argoCD, Metricas, Keda e external accounts
 module "helm" {
   source = "./modules/helm"
 
   external_secrets_role_arn = module.external_secrets.role_arn
-
+  keda_role_arn             = module.keda.role_arn
   depends_on = [
     module.eks,
-    module.external_secrets
+    module.external_secrets,
+    module.keda
   ]
 }
 
@@ -75,6 +76,9 @@ module "rds" {
 
 module "secrets" {
   source = "./modules/secrets"
+
+  redis_endpoint = module.elasticache.redis_endpoint
+  sqs_queue_url  = module.sqs.queue_url
 }
 
 # 5 . Cache (Elasticache Redis - Evaluation Service) 
@@ -125,4 +129,70 @@ module "external_secrets" {
   oidc_issuer_url   = module.eks.oidc_issuer_url
 
   depends_on = [module.eks]
+}
+
+module "cluster_autoscaler" {
+  source = "./modules/cluster-autoscaler"
+
+  cluster_name      = var.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_issuer_url   = module.eks.oidc_issuer_url
+
+  depends_on = [module.eks]
+}
+
+module "evaluation_bootstrap" {
+  source = "./modules/evaluation-bootstrap"
+
+  cluster_name      = var.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_issuer_url   = module.eks.oidc_issuer_url
+
+  depends_on = [
+    module.eks
+  ]
+}
+
+module "evaluation_service" {
+  source = "./modules/evaluation-service"
+
+  cluster_name      = var.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_issuer_url   = module.eks.oidc_issuer_url
+  sqs_queue_arn     = module.sqs.queue_arn
+
+  depends_on = [
+    module.eks,
+    module.sqs
+  ]
+}
+
+module "analytics_service" {
+  source = "./modules/analytics-service"
+
+  cluster_name       = var.cluster_name
+  oidc_provider_arn  = module.eks.oidc_provider_arn
+  oidc_issuer_url    = module.eks.oidc_issuer_url
+  sqs_queue_arn      = module.sqs.queue_arn
+  dynamodb_table_arn = module.dynamodb.table_arn
+
+  depends_on = [
+    module.eks,
+    module.sqs,
+    module.dynamodb
+  ]
+}
+
+module "keda" {
+  source = "./modules/keda"
+
+  cluster_name      = var.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  oidc_issuer_url   = module.eks.oidc_issuer_url
+  sqs_queue_arn     = module.sqs.queue_arn
+
+  depends_on = [
+    module.eks,
+    module.sqs
+  ]
 }

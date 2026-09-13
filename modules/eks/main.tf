@@ -4,9 +4,9 @@
 
 resource "aws_eks_cluster" "main" {
   name     = var.cluster_name
-  role_arn = var.cluster_role_arn  # Usa a Role vinda do módulo IAM
+  role_arn = var.cluster_role_arn # Usa a Role vinda do módulo IAM
 
-   vpc_config {
+  vpc_config {
     subnet_ids              = var.subnet_ids
     endpoint_private_access = true
     endpoint_public_access  = true
@@ -32,10 +32,10 @@ resource "aws_iam_openid_connect_provider" "eks" {
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${var.cluster_name}-node-group"
-  node_role_arn   = var.node_role_arn     # Usa a Role vinda do módulo IAM
+  node_role_arn   = var.node_role_arn # Usa a Role vinda do módulo IAM
   subnet_ids      = var.subnet_ids
 
-  capacity_type  = "ON_DEMAND"            # Força o tipo On-Demand explicitamente
+  capacity_type  = "ON_DEMAND" # Força o tipo On-Demand explicitamente
   instance_types = ["t3.micro"]
 
   scaling_config {
