@@ -1,5 +1,10 @@
 resource "terraform_data" "toggle_prod_application" {
 
+  input = {
+    aws_region   = var.aws_region
+    cluster_name = var.cluster_name
+  }
+
   depends_on = [
     module.helm
   ]
@@ -16,6 +21,8 @@ kind: Application
 metadata:
   name: toggle-prod
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
@@ -34,6 +41,21 @@ spec:
     syncOptions:
       - CreateNamespace=false
 YAML
+    EOT
+  }
+
+  provisioner "local-exec" {
+    when = destroy
+
+    command = <<-EOT
+      aws eks update-kubeconfig \
+        --region ${self.input.aws_region} \
+        --name ${self.input.cluster_name}
+
+      kubectl delete application toggle-prod \
+        -n argocd \
+        --ignore-not-found=true \
+        --wait=true
     EOT
   }
 }

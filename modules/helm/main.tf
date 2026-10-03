@@ -6,6 +6,9 @@ resource "helm_release" "ingress_nginx" {
 
   create_namespace = true
 
+  wait    = true
+  timeout = 600
+
   set {
     name  = "controller.service.type"
     value = "LoadBalancer"
