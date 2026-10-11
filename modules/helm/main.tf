@@ -6,6 +6,9 @@ resource "helm_release" "ingress_nginx" {
 
   create_namespace = true
 
+  wait    = true
+  timeout = 600
+
   set {
     name  = "controller.service.type"
     value = "LoadBalancer"
@@ -52,4 +55,43 @@ resource "helm_release" "external_secrets" {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = var.external_secrets_role_arn
   }
+}
+
+resource "helm_release" "keda" {
+  name       = "keda"
+  repository = "https://kedacore.github.io/charts"
+  chart      = "keda"
+  namespace  = "keda"
+
+  create_namespace = true
+
+  set {
+    name  = "serviceAccount.create"
+    value = "true"
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = "keda-operator"
+  }
+
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = var.keda_role_arn
+  }
+
+  depends_on = [
+    helm_release.external_secrets
+  ]
+}
+
+resource "helm_release" "metrics_server" {
+  name       = "metrics-server"
+  repository = "https://kubernetes-sigs.github.io/metrics-server/"
+  chart      = "metrics-server"
+  namespace  = "kube-system"
+
+  depends_on = [
+    helm_release.external_secrets
+  ]
 }

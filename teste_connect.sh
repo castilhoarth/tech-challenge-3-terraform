@@ -29,13 +29,13 @@ aws eks update-kubeconfig --region us-east-1 --name togglemaster-eks
 echo -e "\n${YELLOW}=== 3. Executando Testes de Conexão no Cluster EKS ===${NC}"
 
 # Pod 1: Validar auth_db
-echo -e "${YELLOW}[TESTE 1/3] Validando acesso ao auth_db...${NC}"
+echo -e "${YELLOW}[TESTE 1] Validando acesso ao auth_db...${NC}"
 kubectl run db-test-auth --rm -i --tty --restart=Never --image=postgres:15-alpine \
   --env="PGPASSWORD=$RDS_AUTH_PWD" -- \
   psql -h $RDS_AUTH_HOST -U auth_user -d auth_db -c "SELECT current_database(), current_user, clock_timestamp();"
 
 # Pod 2: Validar flag_db
-echo -e "\n${YELLOW}[TESTE 2/3] Validando acesso ao flag_db...${NC}"
+echo -e "\n${YELLOW}[TESTE 2] Validando acesso ao flag_db...${NC}"
 kubectl run db-test-flag --rm -i --tty --restart=Never --image=postgres:15-alpine \
   --env="PGPASSWORD=$RDS_FLAG_PWD" -- \
   psql -h $RDS_FLAG_HOST -U flag_user -d flag_db -c "SELECT current_database(), current_user, clock_timestamp();"

@@ -4,7 +4,7 @@ variable "private_subnets_cidr" { type = list(string) }
 variable "availability_zones" { type = list(string) }
 
 variable "cluster_name" {
-    type = string
-    default = "toggle-cluster"
-    description = "Nome do cluster EKS"
+  type        = string
+  default     = "toggle-cluster"
+  description = "Nome do cluster EKS"
 }

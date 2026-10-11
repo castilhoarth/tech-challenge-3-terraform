@@ -22,7 +22,7 @@ variable "eks_security_group_id" {
 
 variable "instances" {
   type = map(object({
-    username = string
+    username  = string
     databases = list(string)
   }))
 }

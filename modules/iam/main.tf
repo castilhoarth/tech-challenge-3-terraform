@@ -2,87 +2,87 @@ data "aws_caller_identity" "current" {}
 
 # Role de Control Plan do EKS
 resource "aws_iam_role" "eks_cluster" {
-    name = "${var.cluster_name}-cluster-role"
+  name = "${var.cluster_name}-cluster-role"
 
-    assume_role_policy = jsonencode({
-        Version = "2012-10-17"
-        Statement = [{
-            Action = "sts:AssumeRole"
-            Effect = "Allow"
-            Principal = { Service = "eks.amazonaws.com" }
-        }]
-    })
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "eks.amazonaws.com" }
+    }]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cluster_Policy" {
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-    role       = aws_iam_role.eks_cluster.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks_cluster.name
 }
 
 # Permissões para o EKS gerenciar Load Balancers dos Services
 resource "aws_iam_policy" "eks_load_balancer" {
-    name = "${var.cluster_name}-load-balancer"
+  name = "${var.cluster_name}-load-balancer"
 
-    policy = jsonencode({
-        Version = "2012-10-17"
-        Statement = [{
-            Effect = "Allow"
-            Action = [
-                "elasticloadbalancing:DescribeLoadBalancers",
-                "elasticloadbalancing:DescribeLoadBalancerAttributes",
-                "elasticloadbalancing:DescribeListeners",
-                "elasticloadbalancing:DescribeListenerAttributes",
-                "elasticloadbalancing:DescribeTargetGroups",
-                "elasticloadbalancing:DescribeTargetHealth",
-                "elasticloadbalancing:CreateLoadBalancer",
-                "elasticloadbalancing:DeleteLoadBalancer",
-                "elasticloadbalancing:CreateTargetGroup",
-                "elasticloadbalancing:DeleteTargetGroup",
-                "elasticloadbalancing:RegisterTargets",
-                "elasticloadbalancing:DeregisterTargets",
-                "elasticloadbalancing:CreateListener",
-                "elasticloadbalancing:DeleteListener",
-                "elasticloadbalancing:ModifyLoadBalancerAttributes",
-                "elasticloadbalancing:ModifyTargetGroup",
-                "elasticloadbalancing:ModifyTargetGroupAttributes"
-            ]
-            Resource = "*"
-        }]
-    })
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "elasticloadbalancing:DescribeLoadBalancerAttributes",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeListenerAttributes",
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:DescribeTargetHealth",
+        "elasticloadbalancing:CreateLoadBalancer",
+        "elasticloadbalancing:DeleteLoadBalancer",
+        "elasticloadbalancing:CreateTargetGroup",
+        "elasticloadbalancing:DeleteTargetGroup",
+        "elasticloadbalancing:RegisterTargets",
+        "elasticloadbalancing:DeregisterTargets",
+        "elasticloadbalancing:CreateListener",
+        "elasticloadbalancing:DeleteListener",
+        "elasticloadbalancing:ModifyLoadBalancerAttributes",
+        "elasticloadbalancing:ModifyTargetGroup",
+        "elasticloadbalancing:ModifyTargetGroupAttributes"
+      ]
+      Resource = "*"
+    }]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "eks_load_balancer" {
-    role       = aws_iam_role.eks_cluster.name
-    policy_arn = aws_iam_policy.eks_load_balancer.arn
+  role       = aws_iam_role.eks_cluster.name
+  policy_arn = aws_iam_policy.eks_load_balancer.arn
 }
 
 # Role dos Node Groups (Workers)
 resource "aws_iam_role" "eks_nodes" {
-    name = "${var.cluster_name}-node-role"
-    
-    assume_role_policy = jsonencode({
-        Version = "2012-10-17"
-        Statement = [{
-            Action = "sts:AssumeRole"
-            Effect = "Allow"
-            Principal = { Service = "ec2.amazonaws.com" }
-        }]
-    })
+  name = "${var.cluster_name}-node-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+    }]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "worker_node_Policy" {
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-    role       = aws_iam_role.eks_nodes.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.eks_nodes.name
 }
 
 resource "aws_iam_role_policy_attachment" "cni_policy" {
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-    role       = aws_iam_role.eks_nodes.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.eks_nodes.name
 }
 
 resource "aws_iam_role_policy_attachment" "ecr_readonly" {
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-    role       = aws_iam_role.eks_nodes.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.eks_nodes.name
 }
 
 # Role utilizada pelos Jobs de migration
