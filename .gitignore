@@ -30,6 +30,8 @@ terraform.rc
 .vscode/
 *.swp
 *.tfvars
+
+# Arquivos temporários de análise do Terraform
 *.dot
 destroy-plan.json
 destroy.tfplan
