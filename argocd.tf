@@ -27,7 +27,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/castilhoarth/tech-challenge-3-k8s.git
-    targetRevision: main
+    targetRevision: feature/fase-4-observabilidade
     path: k8s/
     directory:
       recurse: true
