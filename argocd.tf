@@ -31,6 +31,13 @@ spec:
     path: k8s/
     directory:
       recurse: true
+  ignoreDifferences:
+    - group: ""
+      kind: ConfigMap
+      name: grafana-public-url
+      namespace: observability
+      jsonPointers:
+        - /data/root_url
   destination:
     server: https://kubernetes.default.svc
     namespace: toggle-prod
@@ -40,6 +47,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=false
+      - RespectIgnoreDifferences=true
 YAML
     EOT
   }
