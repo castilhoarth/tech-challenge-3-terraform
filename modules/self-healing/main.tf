@@ -17,6 +17,16 @@ resource "random_password" "webhook_token" {
   special = false
 }
 
+resource "aws_secretsmanager_secret" "webhook_token" {
+  name                    = "tech-challenge/self-healing-webhook-token"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "webhook_token" {
+  secret_id     = aws_secretsmanager_secret.webhook_token.id
+  secret_string = random_password.webhook_token.result
+}
+
 # ------------------------------------------------------------------------------
 # LAMBDA EXECUTION IAM ROLE
 # ------------------------------------------------------------------------------
@@ -51,6 +61,26 @@ resource "aws_iam_role_policy" "sts" {
       Effect   = "Allow"
       Action   = "sts:GetCallerIdentity"
       Resource = "*"
+    }]
+  })
+}
+
+# ------------------------------------------------------------------------------
+# PERMISSION TO READ WEBHOOK TOKEN FROM SECRETS MANAGER
+# ------------------------------------------------------------------------------
+
+resource "aws_iam_role_policy" "secrets_manager" {
+  name = "self-healing-secrets-manager"
+  role = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "secretsmanager:GetSecretValue"
+      ]
+      Resource = aws_secretsmanager_secret.webhook_token.arn
     }]
   })
 }
@@ -126,7 +156,7 @@ resource "aws_lambda_function" "self_healing" {
 
   environment {
     variables = {
-      WEBHOOK_BEARER_TOKEN              = random_password.webhook_token.result
+      WEBHOOK_SECRET_ARN                = aws_secretsmanager_secret.webhook_token.arn
       ALLOWED_NAMESPACE                 = var.allowed_namespace
       EKS_CLUSTER_NAME                  = var.cluster_name
       EKS_CLUSTER_ENDPOINT              = var.eks_cluster_endpoint

@@ -1,0 +1,5 @@
+# boto3 and botocore are provided by the AWS Lambda Python runtime.
+# This file is for local development and testing only.
+# To deploy the Lambda, zip just app.py — no dependencies to install.
+boto3>=1.34.0,<2.0.0
+pytest>=8.0.0,<9.0.0

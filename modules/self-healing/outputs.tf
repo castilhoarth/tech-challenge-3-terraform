@@ -1,12 +1,6 @@
 output "webhook_url" {
   description = "API Gateway webhook URL for Grafana"
-  value       = "https://${aws_apigatewayv2_api.webhook.id}.execute-api.${var.aws_region}.amazonaws.com/"
-}
-
-output "webhook_bearer_token" {
-  description = "Bearer token for Grafana webhook authentication"
-  value       = random_password.webhook_token.result
-  sensitive   = true
+  value       = aws_apigatewayv2_api.webhook.api_endpoint
 }
 
 output "lambda_function_name" {

@@ -208,7 +208,7 @@ module "self_healing" {
   eks_cluster_endpoint       = data.aws_eks_cluster.main.endpoint
   eks_cluster_ca_certificate = data.aws_eks_cluster.main.certificate_authority[0].data
   allowed_namespace          = "toggle-prod"
-  lambda_source_path         = "${path.module}/../self-healing/app.py"
+  lambda_source_path         = "${path.root}/lambda/self-healing/app.py"
 
   depends_on = [
     module.eks,

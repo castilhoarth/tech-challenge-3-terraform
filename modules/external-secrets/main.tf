@@ -54,7 +54,9 @@ resource "aws_iam_policy" "external_secrets" {
         "arn:aws:secretsmanager:us-east-1:${data.aws_caller_identity.current.account_id}:secret:tech-challenge/rds-flag-*",
         "arn:aws:secretsmanager:us-east-1:${data.aws_caller_identity.current.account_id}:secret:tech-challenge/evaluation-api-key-*",
         "arn:aws:secretsmanager:us-east-1:${data.aws_caller_identity.current.account_id}:secret:tech-challenge/evaluation-config-*",
-        "arn:aws:secretsmanager:us-east-1:${data.aws_caller_identity.current.account_id}:secret:tech-challenge/newrelic-license-key-*"
+        "arn:aws:secretsmanager:us-east-1:${data.aws_caller_identity.current.account_id}:secret:tech-challenge/newrelic-license-key-*",
+        "arn:aws:secretsmanager:us-east-1:${data.aws_caller_identity.current.account_id}:secret:tech-challenge/jsm-api-token-*",
+        "arn:aws:secretsmanager:us-east-1:${data.aws_caller_identity.current.account_id}:secret:tech-challenge/self-healing-webhook-token-*"
       ]
     }]
   })
