@@ -11,6 +11,16 @@ resource "aws_eks_cluster" "main" {
     endpoint_private_access = true
     endpoint_public_access  = true
   }
+
+  # API_AND_CONFIG_MAP permite usar tanto Access Entries (AWS API) quanto o
+  # aws-auth ConfigMap (Kubernetes). bootstrap_cluster_creator_admin_permissions
+  # garante que o criador do cluster receba acesso admin automaticamente, evitando
+  # lock-out na recriação do cluster via IaC. O ConfigMap continua disponível para
+  # mapear roles adicionais (ex: Lambda self-healing) via Option B do setup guide.
+  access_config {
+    authentication_mode                         = "API_AND_CONFIG_MAP"
+    bootstrap_cluster_creator_admin_permissions = true
+  }
 }
 
 data "tls_certificate" "eks" {
