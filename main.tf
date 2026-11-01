@@ -198,3 +198,21 @@ module "keda" {
     module.sqs
   ]
 }
+
+# Self-Healing Lambda — rolling restart on Grafana alert
+module "self_healing" {
+  source = "./modules/self-healing"
+
+  cluster_name               = var.cluster_name
+  aws_region                 = var.aws_region
+  eks_cluster_endpoint       = data.aws_eks_cluster.main.endpoint
+  eks_cluster_ca_certificate = data.aws_eks_cluster.main.certificate_authority[0].data
+  allowed_namespace          = "toggle-prod"
+  lambda_source_path         = "${path.module}/../self-healing/app.py"
+
+  depends_on = [
+    module.eks,
+    module.helm,
+    terraform_data.toggle_prod_application
+  ]
+}

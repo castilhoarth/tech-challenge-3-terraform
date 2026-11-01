@@ -17,6 +17,14 @@ terraform {
       source  = "hashicorp/helm"
       version = "~> 2.17"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 3.0"
+    }
   }
 
   # Configuração do Remote State no S3 Backend
