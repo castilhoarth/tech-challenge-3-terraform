@@ -30,9 +30,9 @@ module "eks" {
   node_role_arn    = module.iam.eks_node_role_arn
 
   instance_types = ["t3.small"]
-  desired_size   = 4
-  min_size       = 3
-  max_size       = 6
+  desired_size   = 6
+  min_size       = 5
+  max_size       = 7
 
   depends_on = [module.iam]
 }

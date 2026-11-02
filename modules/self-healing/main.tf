@@ -90,7 +90,7 @@ resource "aws_iam_role_policy" "secrets_manager" {
 # ------------------------------------------------------------------------------
 # Maps the Lambda role to the "self-healing" Kubernetes group. The RBAC
 # RoleBinding (below) binds this group to the Role that grants patch/get
-# on deployments in the target namespace.
+# on deployments in the target namespace. Alterado o RBAC para o K8s
 
 resource "aws_eks_access_entry" "lambda" {
   cluster_name      = var.cluster_name
@@ -98,8 +98,10 @@ resource "aws_eks_access_entry" "lambda" {
   kubernetes_groups = ["self-healing"]
 }
 
+/*
 # ------------------------------------------------------------------------------
 # KUBERNETES RBAC (Step 3)
+# Ajustado para o k8s
 # ------------------------------------------------------------------------------
 
 resource "kubernetes_role_v1" "self_healing" {
@@ -133,7 +135,7 @@ resource "kubernetes_role_binding_v1" "self_healing" {
     api_group = "rbac.authorization.k8s.io"
   }
 }
-
+*/
 # ------------------------------------------------------------------------------
 # LAMBDA FUNCTION (Step 4)
 # ------------------------------------------------------------------------------
@@ -173,6 +175,20 @@ resource "aws_lambda_function" "self_healing" {
 resource "aws_apigatewayv2_api" "webhook" {
   name          = "self-healing-webhook"
   protocol_type = "HTTP"
+}
+
+# ------------------------------------------------------------------------------
+# WEBHOOK URL — SECRETS MANAGER
+# ------------------------------------------------------------------------------
+
+resource "aws_secretsmanager_secret" "webhook_url" {
+  name                    = "tech-challenge/self-healing-webhook-url"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "webhook_url" {
+  secret_id     = aws_secretsmanager_secret.webhook_url.id
+  secret_string = aws_apigatewayv2_api.webhook.api_endpoint
 }
 
 resource "aws_apigatewayv2_integration" "lambda" {

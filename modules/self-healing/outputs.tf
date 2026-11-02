@@ -12,3 +12,8 @@ output "lambda_role_arn" {
   description = "ARN of the Lambda execution IAM role"
   value       = aws_iam_role.lambda.arn
 }
+
+output "webhook_url_secret_arn" {
+  description = "ARN of the Secrets Manager secret containing the Grafana webhook URL"
+  value       = aws_secretsmanager_secret.webhook_url.arn
+}
